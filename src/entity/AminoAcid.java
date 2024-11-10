@@ -5,21 +5,18 @@ import types.AcidType;
 import types.Direction;
 
 public class AminoAcid {
-    private final AcidType type;
     private final int acidIndex;
     private Coordinates coordinates;
     private Direction previousAcid;
     private Direction nextAcid;
 
 
-    public AminoAcid(AcidType type, int acidIndex) {
-        this.type = type;
+    public AminoAcid(int acidIndex) {
         this.acidIndex = acidIndex;
         this.coordinates = new Coordinates();
     }
 
     public AminoAcid(AminoAcid aa) {
-        this.type = aa.type;
         this.acidIndex = aa.acidIndex;
         this.coordinates = new Coordinates(aa.coordinates); // Assuming Coordinates has a copy constructor
         this.previousAcid = aa.previousAcid;
@@ -39,10 +36,6 @@ public class AminoAcid {
             default:
                 throw new IllegalArgumentException("Invalid direction: " + direction);
         }
-    }
-
-    public AcidType getType() {
-        return type;
     }
 
     public int getAcidIndex() {

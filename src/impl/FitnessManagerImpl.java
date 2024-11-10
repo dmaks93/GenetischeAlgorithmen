@@ -17,12 +17,12 @@ public class FitnessManagerImpl extends FitnessManager {
     private Set<String> overlaps = new HashSet<>();
 
     @Override
-    public void fitnessFunction(Protein protein) {
+    public void fitnessFunction(Protein protein,  ArrayList<AcidType> types) {
         // Clear previous data
         hhBonds.clear();
         overlaps.clear();
 
-        int contacts = this.countContacts(protein);
+        int contacts = this.countContacts(protein, types);
         int overlapping = this.countOverlapping(protein);
         int sequenceLenght = protein.aminoAcids.size();
         double fitness = this.calculateFitness(contacts, overlapping, sequenceLenght);
@@ -44,7 +44,7 @@ public class FitnessManagerImpl extends FitnessManager {
     }
 
     @Override
-    public int countContacts(Protein protein) {
+    public int countContacts(Protein protein, ArrayList<AcidType> types) {
         int contacts = 0;
         Set<String> contactSet = new HashSet<>(); // To ensure unique contacts
 
@@ -53,7 +53,7 @@ public class FitnessManagerImpl extends FitnessManager {
         for (int i = 0; i < aminoAcids.size(); i++) {
             AminoAcid currentAcid = aminoAcids.get(i);
 
-            if (currentAcid.getType() == AcidType.BLACK) {
+            if (types.get(i) == AcidType.BLACK) {
                 int currentX = currentAcid.getCoordinates().getX();
                 int currentY = currentAcid.getCoordinates().getY();
 
@@ -68,7 +68,7 @@ public class FitnessManagerImpl extends FitnessManager {
                         if (i != j) { // Ensure not to observe yourself
                             AminoAcid otherAcid = aminoAcids.get(j);
 
-                            if (otherAcid.getType() == AcidType.BLACK && // check if it is black and neighbor
+                            if (types.get(j) == AcidType.BLACK && // check if it is black and neighbor
                                     otherAcid.getCoordinates().getX() == neighborX &&
                                     otherAcid.getCoordinates().getY() == neighborY) {
 
