@@ -1,14 +1,13 @@
 package entity;
 
 
-import types.AcidType;
 import types.Direction;
 
 public class AminoAcid {
     private final int acidIndex;
     private Coordinates coordinates;
-    private Direction previousAcid;
-    private Direction nextAcid;
+    private Direction previousAcidDirection;
+    private Direction nextAcidDirection;
 
 
     public AminoAcid(int acidIndex) {
@@ -19,8 +18,8 @@ public class AminoAcid {
     public AminoAcid(AminoAcid aa) {
         this.acidIndex = aa.acidIndex;
         this.coordinates = new Coordinates(aa.coordinates); // Assuming Coordinates has a copy constructor
-        this.previousAcid = aa.previousAcid;
-        this.nextAcid = aa.nextAcid;
+        this.previousAcidDirection = aa.previousAcidDirection;
+        this.nextAcidDirection = aa.nextAcidDirection;
     }
 
     public Direction getOppositeDirection(Direction direction) {
@@ -51,19 +50,19 @@ public class AminoAcid {
         this.coordinates.setY(y);
     }
 
-    public Direction getPreviousAcid() {
-        return this.previousAcid;
+    public Direction getPreviousAcidDirection() {
+        return this.previousAcidDirection;
     }
 
-    public void setPreviousAcid(Direction previousAcid) {
-        this.previousAcid = previousAcid;
+    public void setPreviousAcidDirection(Direction previousAcidDirection) {
+        this.previousAcidDirection = previousAcidDirection;
     }
 
-    public Direction getNextAcid() {
-        return this.nextAcid;
+    public Direction getNextAcidDirection() {
+        return this.nextAcidDirection;
     }
 
-    public void setNextAcid(Direction nextAcid) {
-        this.nextAcid = nextAcid;
+    public void setNextAcidDirection(Direction nextAcidDirection) {
+        this.nextAcidDirection = nextAcidDirection;
     }
 }

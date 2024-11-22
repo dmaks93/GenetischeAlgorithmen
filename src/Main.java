@@ -1,3 +1,4 @@
+import api.Graphics;
 import entity.*;
 import impl.*;
 import types.*;
@@ -57,5 +58,8 @@ public class Main {
         l1_FitnessManager.fitnessFunction(l1_protein_1, l1_seq_1_acidTypes);
         System.out.println();
         l1_FitnessManager.fitnessFunction(l1_protein_2, l1_seq_1_acidTypes);
+
+        Graphics graphics = new Graphics(l1_protein_2, l1_seq_1);
+        graphics.drawProtein();
     }
 }

@@ -93,7 +93,7 @@ public class FitnessManagerImpl extends FitnessManager {
     @Override
     public int countOverlapping(Protein protein) {
         int overlappings = 0;
-        Map<String, Set<Integer>> positionMap = new HashMap<>(); //
+        Map<String, Set<Integer>> positionMap = new HashMap<>();
 
         for (AminoAcid acid : protein.aminoAcids) {
             String positionKey = acid.getCoordinates().getX() + "-" + acid.getCoordinates().getY();

@@ -24,10 +24,10 @@ public class ProteinManagerImpl extends ProteinManager {
         for (int i = 0; i < sequence.size(); i++) {
             acid = new AminoAcid(sequence.get(i));
             if (i != sequence.size() - 1)
-                acid.setNextAcid(directions.get(i));
+                acid.setNextAcidDirection(directions.get(i));
             if (i != 0) {
                 prevDirection = this.getOppositeDirection(directions.get(i - 1));
-                acid.setPreviousAcid(prevDirection);
+                acid.setPreviousAcidDirection(prevDirection);
             }
             this.calculateCoordinateMovement(acid);
             proteinSequence.add(acid);
@@ -59,7 +59,7 @@ public class ProteinManagerImpl extends ProteinManager {
 
     @Override
     public void calculateCoordinateMovement(AminoAcid acid) {
-        Direction prevDirection = acid.getPreviousAcid();
+        Direction prevDirection = acid.getPreviousAcidDirection();
 
         if (prevDirection == Direction.Up) {
             acid.setCoordinates(xCoordinate, yCoordinate - 1);
