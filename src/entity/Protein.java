@@ -1,12 +1,17 @@
 package entity;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Protein {
     private double fitness;
     private int contacts;
     private int overlapping;
-    public ArrayList<AminoAcid> aminoAcids;
+    private Set<String> hhBonds;
+    private Set<String> overlaps;
+    private ArrayList<AminoAcid> aminoAcids;
+    private int generation;
 
     public Protein() {}
 
@@ -23,6 +28,20 @@ public class Protein {
         this.aminoAcids = new ArrayList<>();
         for (AminoAcid aa : protein.aminoAcids) {
             this.aminoAcids.add(new AminoAcid(aa));
+        }
+
+        // Deep copy of hhBonds
+        if (protein.hhBonds != null) {
+            this.hhBonds = new HashSet<>(protein.hhBonds); // Creates a new Set with copied values
+        } else {
+            this.hhBonds = new HashSet<>();
+        }
+
+        // Deep copy of overlaps
+        if (protein.overlaps != null) {
+            this.overlaps = new HashSet<>(protein.overlaps); // Creates a new Set with copied values
+        } else {
+            this.overlaps = new HashSet<>();
         }
     }
 
@@ -49,4 +68,19 @@ public class Protein {
     public void setOverlapping(int overlapping) {
         this.overlapping = overlapping;
     }
+
+    public Set<String> getHhBonds() { return hhBonds; }
+
+    public void setHhBonds(Set<String> hhBonds) { this.hhBonds = hhBonds; }
+
+    public Set<String> getOverlaps() { return overlaps; }
+
+    public void setOverlaps(Set<String> overlaps) { this.overlaps = overlaps; }
+
+    public ArrayList<AminoAcid> getAminoAcids() { return aminoAcids; }
+
+    public int getGeneration() { return generation; }
+
+    public void setGeneration(int generation) { this.generation = generation; }
+
 }

@@ -1,65 +1,20 @@
-import api.Graphics;
-import entity.*;
 import impl.*;
-import types.*;
-
-
-import java.util.ArrayList;
 
 
 public class Main {
     public static void main(String[] args) {
 
-        String l1_seq_1 = "01001110";
-        ArrayList<AcidType> l1_seq_1_acidTypes = new ArrayList<>();
+        String SEQ20 = "10100110100101100101";
+        String SEQ24 = "110010010010010010010011";
+        String SEQ25 = "0010011000011000011000011";
+        String SEQ36 = "000110011000001111111001100001100100";
+        String SEQ48 = "001001100110000011111111110000001100110010011111";
+        String SEQ50 = "11010101011110100010001000010001000101111010101011";
+        String SEQ60 = "001110111111110001111111111010001111111111110000111111011010";
+        String SEQ64 = "1111111111110101001100110010011001100100110011001010111111111111";
 
-        for (int i = 0; i < l1_seq_1.length(); i++) {
-            AcidType currentType = AcidType.UNKNOWN;
-            if (l1_seq_1.charAt(i) == '0')
-                currentType = AcidType.BLACK;
-            if (l1_seq_1.charAt(i) == '1')
-                currentType = AcidType.WHITE;
-            l1_seq_1_acidTypes.add(currentType);
-        }
+        EvolutionManagerImpl evolutionManager = new EvolutionManagerImpl();
+        evolutionManager.evolution(SEQ20, 100, 100);
 
-        ArrayList<AminoAcid> l1_acidSequence_1 = new ArrayList<>();
-        ArrayList<AminoAcid> l1_acidSequence_2 = new ArrayList<>();
-
-        ArrayList<Direction> l1_directionSequence_1 = new ArrayList<>();
-        Protein l1_protein_1 = new Protein();
-        l1_directionSequence_1.add(Direction.Up);
-        l1_directionSequence_1.add(Direction.Left);
-        l1_directionSequence_1.add(Direction.Down);
-        l1_directionSequence_1.add(Direction.Left);
-        l1_directionSequence_1.add(Direction.Up);
-        l1_directionSequence_1.add(Direction.Up);
-        l1_directionSequence_1.add(Direction.Right);
-
-        ArrayList<Direction> l1_directionSequence_2 = new ArrayList<>();
-        Protein l1_protein_2 = new Protein();
-        l1_directionSequence_2.add(Direction.Up);
-        l1_directionSequence_2.add(Direction.Left);
-        l1_directionSequence_2.add(Direction.Down);
-        l1_directionSequence_2.add(Direction.Left);
-        l1_directionSequence_2.add(Direction.Down);
-        l1_directionSequence_2.add(Direction.Right);
-        l1_directionSequence_2.add(Direction.Up);
-
-        AcidManagerImpl l1_AcidManager = new AcidManagerImpl();
-        ProteinManagerImpl l1_ProteinManager = new ProteinManagerImpl();
-        FitnessManagerImpl l1_FitnessManager = new FitnessManagerImpl();
-
-        l1_acidSequence_1 = l1_AcidManager.createAcidSequence(l1_seq_1);
-        l1_acidSequence_2 = l1_AcidManager.createAcidSequence(l1_seq_1);
-
-        l1_protein_1 = l1_ProteinManager.proteinCreator(l1_acidSequence_1, l1_directionSequence_1);
-        l1_protein_2 = l1_ProteinManager.proteinCreator(l1_acidSequence_2, l1_directionSequence_2);
-
-        l1_FitnessManager.fitnessFunction(l1_protein_1, l1_seq_1_acidTypes);
-        System.out.println();
-        l1_FitnessManager.fitnessFunction(l1_protein_2, l1_seq_1_acidTypes);
-
-        Graphics graphics = new Graphics(l1_protein_2, l1_seq_1);
-        graphics.drawProtein();
     }
 }

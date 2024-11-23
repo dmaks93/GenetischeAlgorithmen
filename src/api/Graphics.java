@@ -14,12 +14,13 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Set;
 import javax.imageio.ImageIO;
 
 
 public class Graphics {
-    int height = 4000;
-    int width = 4000;
+    int height = 8000;
+    int width = 8000;
     int cellSize = 80;
     int x = width / 2;
     int y = height / 2;
@@ -27,8 +28,11 @@ public class Graphics {
     int contacts;
     int overlappings;
     String sequence;
+    Set<String> hhBonds;
+    Set<String> overlaps;
     ArrayList<AminoAcid> aminoAcids;
     ArrayList<Coordinates> coordinates = new ArrayList<>();
+    int generation;
 
 
     public Graphics(Protein protein, String sequence) {
@@ -36,10 +40,13 @@ public class Graphics {
         this.contacts = protein.getContacts();
         this.overlappings = protein.getOverlapping();
         this.sequence = sequence;
-        this.aminoAcids = protein.aminoAcids;
+        this.aminoAcids = protein.getAminoAcids();
+        this.hhBonds = protein.getHhBonds();
+        this.overlaps = protein.getOverlaps();
         for (int i = 0; i < aminoAcids.size(); i++) {
             coordinates.add(new Coordinates(aminoAcids.get(i).getCoordinates().getX(), aminoAcids.get(i).getCoordinates().getY()));
         }
+        this.generation = protein.getGeneration();
     }
 
     public void drawProtein() {
@@ -50,10 +57,12 @@ public class Graphics {
         g2.setColor(Color.YELLOW);
         g2.fillRect(0, 0, width, height);
 
-        this.writeText(g2, 50, 50, "Generation: ");
-        this.writeText(g2, 50, 100, "There are " + contacts + " hydrophobic contacts");
-        this.writeText(g2, 50, 150, "There are " + overlappings + " overlappings");
-        this.writeText(g2, 50, 200, "Fitness of this protein is: " + fitness);
+        this.writeText(g2, 50, 50, "Generation: " + generation);
+        this.writeText(g2, 50, 100, "Contacts: " + contacts);
+        this.writeText(g2, 50, 150, "Overlappings: " + overlappings);
+        this.writeText(g2, 50, 200, "Fitness: " + fitness);
+        this.writeText(g2, 50, 250, "H/H Bonds:" + hhBonds);
+        this.writeText(g2, 50, 300, "Overlappings: " + overlaps);
 
 
         for (int i = 0; i < sequence.length(); i++) {
@@ -69,15 +78,23 @@ public class Graphics {
             }
             g2.fillRect(x, y, cellSize, cellSize);
 
-            g2.setColor(Color.GREEN);
             String label = String.valueOf(i);
             for (int j = 0; j < i; j++) {
                 tX = coordinates.get(j).getX();
                 tY = coordinates.get(j).getY();
                 if (currX == tX && currY == tY) {
+                    // Overlap detected: Draw a smaller rectangle
+                    if (sequence.charAt(j) == '0') {
+                        g2.setColor(new Color(0, 0, 0, 150)); // Semi-transparent black
+                    } else if (sequence.charAt(j) == '1') {
+                        g2.setColor(new Color(255, 255, 255, 150)); // Semi-transparent white
+                    }
+                    int overlapOffset = 10; // Smaller size for overlapping acid
+                    g2.fillRect(x + overlapOffset, y + overlapOffset, cellSize - 2 * overlapOffset, cellSize - 2 * overlapOffset);
                     label = String.valueOf(j) + ", " + label;
                 }
             }
+            g2.setColor(Color.GREEN);
             Font font = new Font("Serif", Font.PLAIN, 20);
             g2.setFont(font);
             FontMetrics metrics = g2.getFontMetrics();

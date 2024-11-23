@@ -91,9 +91,9 @@ public class ProteinManagerImpl extends ProteinManager {
         for (int i = 0; i < directionSequenceLength; i++) {
             while (!validDirection) {
                 validDirection = true;
-                directionAsInteger = randIntGenerator.nextInt(4);
+                directionAsInteger = randIntGenerator.nextInt(1000);
                 currentDirection = this.directionTranslator(directionAsInteger);
-                if(i > 0){
+                if (i > 0) {
                     prevDirection = directions.get(i - 1);
                     validDirection = this.directionValidityCheck(currentDirection, prevDirection);
                 }
@@ -106,25 +106,26 @@ public class ProteinManagerImpl extends ProteinManager {
 
     private Direction directionTranslator(int directionAsInteger) {
         Direction direction = null;
-        if(directionAsInteger == 0)
+        if (directionAsInteger <= 250) {
             direction = Direction.Left;
-        if(directionAsInteger == 1)
+        } else if (directionAsInteger <= 500) {
             direction = Direction.Right;
-        if(directionAsInteger == 2)
+        } else if (directionAsInteger <= 750) {
             direction = Direction.Up;
-        if(directionAsInteger == 3)
+        } else if (directionAsInteger <= 1000) {
             direction = Direction.Down;
+        }
         return direction;
     }
 
     private boolean directionValidityCheck(Direction currentDirection, Direction previousDirection) {
-        if(currentDirection == Direction.Left && previousDirection == Direction.Right)
+        if (currentDirection == Direction.Left && previousDirection == Direction.Right)
             return false;
-        if(currentDirection == Direction.Right && previousDirection == Direction.Left)
+        if (currentDirection == Direction.Right && previousDirection == Direction.Left)
             return false;
-        if(currentDirection == Direction.Up && previousDirection == Direction.Down)
+        if (currentDirection == Direction.Up && previousDirection == Direction.Down)
             return false;
-        if(currentDirection == Direction.Down && previousDirection == Direction.Up)
+        if (currentDirection == Direction.Down && previousDirection == Direction.Up)
             return false;
         return true;
     }

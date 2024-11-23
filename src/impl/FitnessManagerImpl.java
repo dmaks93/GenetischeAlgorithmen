@@ -24,23 +24,15 @@ public class FitnessManagerImpl extends FitnessManager {
 
         int contacts = this.countContacts(protein, types);
         int overlapping = this.countOverlapping(protein);
-        int sequenceLenght = protein.aminoAcids.size();
-        double fitness = this.calculateFitness(contacts, overlapping, sequenceLenght);
-
-        System.out.println("H/H Bonds: " + hhBonds);
-        System.out.println("Overlapping: " + overlaps);
-        System.out.println("Contacts: " + contacts);
-        System.out.println("Overlapping: " + overlapping);
-        System.out.println("Sequence length: " + sequenceLenght);
-        System.out.println("Fitness: " + fitness);
-        System.out.println();
-        System.out.println();
+        int sequenceLength = protein.getAminoAcids().size();
+        double fitness = this.calculateFitness(contacts, overlapping, sequenceLength);
+        protein.setHhBonds(new HashSet<>(hhBonds));
+        protein.setOverlaps(new HashSet<>(overlaps));
 
         protein.setFitness(fitness);
         protein.setContacts(contacts);
         protein.setOverlapping(overlapping);
 
-        //  return fitness;
     }
 
     @Override
@@ -48,7 +40,7 @@ public class FitnessManagerImpl extends FitnessManager {
         int contacts = 0;
         Set<String> contactSet = new HashSet<>(); // To ensure unique contacts
 
-        ArrayList<AminoAcid> aminoAcids = protein.aminoAcids;
+        ArrayList<AminoAcid> aminoAcids = protein.getAminoAcids();
 
         for (int i = 0; i < aminoAcids.size(); i++) {
             AminoAcid currentAcid = aminoAcids.get(i);
@@ -95,7 +87,7 @@ public class FitnessManagerImpl extends FitnessManager {
         int overlappings = 0;
         Map<String, Set<Integer>> positionMap = new HashMap<>();
 
-        for (AminoAcid acid : protein.aminoAcids) {
+        for (AminoAcid acid : protein.getAminoAcids()) {
             String positionKey = acid.getCoordinates().getX() + "-" + acid.getCoordinates().getY();
 
             if (!positionMap.containsKey(positionKey)) {
