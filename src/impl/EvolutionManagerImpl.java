@@ -62,6 +62,73 @@ public class EvolutionManagerImpl extends EvolutionManager {
     }
 
     @Override
+    public void crossover(ArrayList<Protein> population, int length) {
+        Random random = new Random();
+        int firstCandidateInPopulation;
+        int secondCandidateInPopulation;
+        int splitPosition = random.nextInt(length - 1) + 1;
+        Protein firstCandidate;
+        Protein secondCandidate;
+
+        do {
+             firstCandidateInPopulation = random.nextInt(population.size());
+             secondCandidateInPopulation = random.nextInt(population.size());
+        } while (firstCandidateInPopulation == secondCandidateInPopulation);
+
+        firstCandidate = population.get(firstCandidateInPopulation);
+        secondCandidate = population.get(secondCandidateInPopulation);
+
+        // Get the amino acids from each candidate
+        ArrayList<AminoAcid> firstAcids = firstCandidate.getAminoAcids();
+        ArrayList<AminoAcid> secondAcids = secondCandidate.getAminoAcids();
+
+        // Perform the crossover
+        ArrayList<AminoAcid> firstLeft = new ArrayList<>(firstAcids.subList(0, splitPosition));
+        ArrayList<AminoAcid> firstRight = new ArrayList<>(firstAcids.subList(splitPosition, firstAcids.size()));
+
+        ArrayList<AminoAcid> secondLeft = new ArrayList<>(secondAcids.subList(0, splitPosition));
+        ArrayList<AminoAcid> secondRight = new ArrayList<>(secondAcids.subList(splitPosition, secondAcids.size()));
+
+        // Swap the segments
+        firstLeft.addAll(secondRight);
+        secondLeft.addAll(firstRight);
+
+        // Update connecting acids' directions for the first candidate
+        // Last amino acid of firstLeft connects to first amino acid of secondRight
+        AminoAcid firstLeftLast = firstLeft.getLast();
+        AminoAcid secondRightFirst = secondRight.getFirst();
+
+        firstLeftLast.setNextAcidDirection(secondRightFirst.getPreviousAcidDirection());
+        secondRightFirst.setPreviousAcidDirection(firstLeftLast.getNextAcidDirection());
+
+        // Last amino acid of secondLeft connects to first amino acid of firstRight
+        AminoAcid secondLeftLast = secondLeft.getLast();
+        AminoAcid firstRightFirst = firstRight.getFirst();
+
+        secondLeftLast.setNextAcidDirection(firstRightFirst.getPreviousAcidDirection());
+        firstRightFirst.setPreviousAcidDirection(secondLeftLast.getNextAcidDirection());
+
+        // Update coordinates here
+        for (int i = 1; i < length; i++) {
+            proteinManager.calculateCoordinateMovement(firstLeft.get(i));
+            proteinManager.calculateCoordinateMovement(secondLeft.get(i));
+        }
+
+        // Update the candidates with the new sequences
+        firstCandidate.setAminoAcids(firstLeft);
+        secondCandidate.setAminoAcids(secondLeft);
+
+        // Calculate fitness for protein here
+
+
+    }
+
+    @Override
+    public void mutate() {
+
+    }
+
+    @Override
     public void evolution(String sequence, int populationSize, int numberOfGenerations) {
         ArrayList<Protein> population = new ArrayList<>();
         ArrayList<AminoAcid> acidSequence = acidManager.createAcidSequence(sequence);
@@ -91,6 +158,9 @@ public class EvolutionManagerImpl extends EvolutionManager {
                 this.collectData(population, true, gen);
 
             population = this.fitnessProportionalSelection(population);
+
+            // Here figure out if crossover happens or not based on probability
+            // Here figure out if mutation happens or not based on probability
         }
         System.out.println(bestEverProtein.getContacts());
         System.out.println(bestEverProtein.getOverlapping());

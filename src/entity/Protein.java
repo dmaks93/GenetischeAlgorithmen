@@ -83,4 +83,6 @@ public class Protein {
 
     public void setGeneration(int generation) { this.generation = generation; }
 
+    public void setAminoAcids(ArrayList<AminoAcid> aminoAcids) { this.aminoAcids = aminoAcids; }
+
 }

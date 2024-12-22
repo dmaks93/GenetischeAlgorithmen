@@ -17,4 +17,17 @@ public class Main {
         evolutionManager.evolution(SEQ20, 100, 100);
 
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

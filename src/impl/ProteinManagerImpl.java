@@ -11,8 +11,8 @@ import java.util.Random;
 
 public class ProteinManagerImpl extends ProteinManager {
     private ArrayList<AminoAcid> proteinSequence;
-    static int xCoordinate = 0;
-    static int yCoordinate = 0;
+     int xCoordinate = 0;
+     int yCoordinate = 0;
 
     @Override
     public Protein proteinCreator(ArrayList<AminoAcid> sequence, ArrayList<Direction> directions) {
