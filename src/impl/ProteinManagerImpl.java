@@ -11,8 +11,8 @@ import java.util.Random;
 
 public class ProteinManagerImpl extends ProteinManager {
     private ArrayList<AminoAcid> proteinSequence;
-     int xCoordinate = 0;
-     int yCoordinate = 0;
+     static int xCoordinate = 0;
+     static int yCoordinate = 0;
 
     @Override
     public Protein proteinCreator(ArrayList<AminoAcid> sequence, ArrayList<Direction> directions) {
@@ -91,7 +91,7 @@ public class ProteinManagerImpl extends ProteinManager {
         for (int i = 0; i < directionSequenceLength; i++) {
             while (!validDirection) {
                 validDirection = true;
-                directionAsInteger = randIntGenerator.nextInt(1000);
+                directionAsInteger = randIntGenerator.nextInt(1000) + 1;
                 currentDirection = this.directionTranslator(directionAsInteger);
                 if (i > 0) {
                     prevDirection = directions.get(i - 1);
@@ -104,7 +104,8 @@ public class ProteinManagerImpl extends ProteinManager {
         return directions;
     }
 
-    private Direction directionTranslator(int directionAsInteger) {
+    @Override
+    public Direction directionTranslator(int directionAsInteger) {
         Direction direction = null;
         if (directionAsInteger <= 250) {
             direction = Direction.Left;
@@ -118,7 +119,8 @@ public class ProteinManagerImpl extends ProteinManager {
         return direction;
     }
 
-    private boolean directionValidityCheck(Direction currentDirection, Direction previousDirection) {
+    @Override
+    public boolean directionValidityCheck(Direction currentDirection, Direction previousDirection) {
         if (currentDirection == Direction.Left && previousDirection == Direction.Right)
             return false;
         if (currentDirection == Direction.Right && previousDirection == Direction.Left)

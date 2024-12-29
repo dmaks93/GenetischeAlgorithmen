@@ -13,8 +13,10 @@ public class Main {
         String SEQ60 = "001110111111110001111111111010001111111111110000111111011010";
         String SEQ64 = "1111111111110101001100110010011001100100110011001010111111111111";
 
+        String SEQ00 = "00011100";
+
         EvolutionManagerImpl evolutionManager = new EvolutionManagerImpl();
-        evolutionManager.evolution(SEQ20, 100, 100);
+        evolutionManager.evolution(SEQ20, 100, 100, 0.2, 0.2);
 
     }
 

@@ -1,5 +1,7 @@
 package entity;
 
+import types.AcidType;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -11,6 +13,7 @@ public class Protein {
     private Set<String> hhBonds;
     private Set<String> overlaps;
     private ArrayList<AminoAcid> aminoAcids;
+    private ArrayList<AcidType> acidTypes;
     private int generation;
 
     public Protein() {}
@@ -28,6 +31,12 @@ public class Protein {
         this.aminoAcids = new ArrayList<>();
         for (AminoAcid aa : protein.aminoAcids) {
             this.aminoAcids.add(new AminoAcid(aa));
+        }
+
+        if (protein.acidTypes != null) {
+            this.acidTypes = new ArrayList<>(protein.acidTypes);
+        } else {
+            this.acidTypes = new ArrayList<>();
         }
 
         // Deep copy of hhBonds
@@ -84,5 +93,7 @@ public class Protein {
     public void setGeneration(int generation) { this.generation = generation; }
 
     public void setAminoAcids(ArrayList<AminoAcid> aminoAcids) { this.aminoAcids = aminoAcids; }
+
+    public void setAcidTypes(ArrayList<AcidType> acidTypes) { this.acidTypes = acidTypes; }
 
 }

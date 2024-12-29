@@ -19,4 +19,8 @@ public abstract class ProteinManager {
 
     public abstract ArrayList<Direction> createDirectionSequence(int directionSequenceLength);
 
+    public abstract  Direction directionTranslator(int directionAsInteger);
+
+    public abstract boolean directionValidityCheck(Direction currentDirection, Direction previousDirection);
+
 }
