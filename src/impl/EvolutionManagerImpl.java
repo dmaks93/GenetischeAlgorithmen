@@ -116,12 +116,12 @@ public class EvolutionManagerImpl extends EvolutionManager {
 
         // Update coordinates here
         for (int i = 1; i < length; i++) {
-            adaptCoordinates(firstLeft.get(i), prevX, prevY);
+            adaptCoordinates(firstLeft.get(i));
         }
         prevX = 0;
         prevY = 0;
         for (int j = 0; j < length; j++) {
-            adaptCoordinates(secondLeft.get(j), prevX, prevY);
+            adaptCoordinates(secondLeft.get(j));
         }
         prevX = 0;
         prevY = 0;
@@ -133,9 +133,6 @@ public class EvolutionManagerImpl extends EvolutionManager {
 
     @Override
     public void mutate(ArrayList<Protein> population) {
-        // is always same random for acidInSequence
-        // Issue with coordinates?
-        // Check coordinates in crossover as well
         prevX = 0;
         prevY = 0;
         Random random = new Random();
@@ -167,7 +164,7 @@ public class EvolutionManagerImpl extends EvolutionManager {
         }
         if (isValid) {
             for (int i = 1; i < length; i++) {
-                adaptCoordinates(acids.get(i), prevX, prevY);
+                adaptCoordinates(acids.get(i));
             }
         }
     }
@@ -228,7 +225,7 @@ public class EvolutionManagerImpl extends EvolutionManager {
         graphics.drawProtein();
     }
 
-    private void adaptCoordinates(AminoAcid acid, int prevX, int prevY) {
+    private void adaptCoordinates(AminoAcid acid) {
         Direction prevDirection = acid.getPreviousAcidDirection();
 
         if (prevDirection == Direction.Up) {

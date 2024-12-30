@@ -16,7 +16,7 @@ public class Main {
         String SEQ00 = "00011100";
 
         EvolutionManagerImpl evolutionManager = new EvolutionManagerImpl();
-        evolutionManager.evolution(SEQ20, 100, 100, 0.2, 0.2);
+        evolutionManager.evolution(SEQ20, 200, 300, 0.3, 0.2);
 
     }
 
