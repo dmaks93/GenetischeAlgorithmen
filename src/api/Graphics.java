@@ -71,9 +71,9 @@ public class Graphics {
             int tX = 0;
             int tY = 0;
 
-            if (sequence.charAt(i) == '0') {
+            if (sequence.charAt(i) == '1') {
                 g2.setColor(Color.BLACK);
-            } else if (sequence.charAt(i) == '1') {
+            } else if (sequence.charAt(i) == '0') {
                 g2.setColor(Color.WHITE);
             }
             g2.fillRect(x, y, cellSize, cellSize);
@@ -84,9 +84,9 @@ public class Graphics {
                 tY = coordinates.get(j).getY();
                 if (currX == tX && currY == tY) {
                     // Overlap detected: Draw a smaller rectangle
-                    if (sequence.charAt(j) == '0') {
+                    if (sequence.charAt(j) == '1') {
                         g2.setColor(new Color(0, 0, 0, 150)); // Semi-transparent black
-                    } else if (sequence.charAt(j) == '1') {
+                    } else if (sequence.charAt(j) == '0') {
                         g2.setColor(new Color(255, 255, 255, 150)); // Semi-transparent white
                     }
                     int overlapOffset = 10; // Smaller size for overlapping acid

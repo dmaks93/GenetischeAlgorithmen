@@ -22,7 +22,9 @@ public class EvolutionManagerImpl extends EvolutionManager {
     ProteinManagerImpl proteinManager = new ProteinManagerImpl();
     FitnessManagerImpl fitnessManager = new FitnessManagerImpl();
     Protein bestEverProtein = new Protein();
+    Protein currentBestCandidate;
     double populationAverageFitness = 0.0;
+    double prevAverageFitness = 0.0;
     double bestFitnessOfGeneration = 0.0;
     double bestFitnessEver = 0.0;
     int bestEverContacts = 0;
@@ -31,6 +33,8 @@ public class EvolutionManagerImpl extends EvolutionManager {
     static int prevY = 0;
     ArrayList<AcidType> acidTypes = new ArrayList<>();
     int numberOfCrossovers;
+    int numberOfMutations;
+    double mutationRate;
     int length;
     static int gen = 1;
     private final DecimalFormat df = new DecimalFormat("#,##0.00", DecimalFormatSymbols.getInstance(Locale.GERMANY));
@@ -61,6 +65,48 @@ public class EvolutionManagerImpl extends EvolutionManager {
                 }
             }
         }
+        population.clear();
+        population = null;
+        this.collectData(selectedMembers, false, gen);
+        return selectedMembers;
+    }
+
+    @Override
+    public ArrayList<Protein> tournamentSelection(ArrayList<Protein> population) {
+        Random random = new Random();
+        gen++;
+        ArrayList<Protein> selectedMembers = new ArrayList<>();
+        int winProbability = 85;
+        selectedMembers.add(new Protein(currentBestCandidate)); // Make sure that current best of the generation is selected
+        Protein firstCandidate;
+        Protein secondCandidate;
+        Protein winner = null;
+        Protein loser = null;
+        int t;
+
+        for (int i = 1; i < population.size(); i++) {
+            firstCandidate = population.remove(random.nextInt(population.size()));
+            secondCandidate = population.remove(random.nextInt(population.size()));
+            t = random.nextInt(101);
+
+            if (firstCandidate.getFitness() >= secondCandidate.getFitness()) {
+                winner = firstCandidate;
+                loser = secondCandidate;
+            } else if (firstCandidate.getFitness() < secondCandidate.getFitness()) {
+                winner = secondCandidate;
+                loser = firstCandidate;
+            }
+
+            if (winProbability >= t) {
+                selectedMembers.add(new Protein(winner));
+            } else {
+                selectedMembers.add(new Protein(loser));
+            }
+            population.add(firstCandidate);
+            population.add(secondCandidate);
+        }
+
+
         population.clear();
         population = null;
         this.collectData(selectedMembers, false, gen);
@@ -144,7 +190,7 @@ public class EvolutionManagerImpl extends EvolutionManager {
         AminoAcid firstAcid = acids.get(acidInSequence);
         AminoAcid secondAcid = acids.get(acidInSequence + 1);
 
-        Protein observer = population.get(candidateInPopulation);
+        //Protein observer = population.get(candidateInPopulation);
 
         Direction mutatedDirection;
         boolean isValid = false;
@@ -170,19 +216,20 @@ public class EvolutionManagerImpl extends EvolutionManager {
     }
 
     @Override
-    public void evolution(String sequence, int populationSize, int numberOfGenerations, double crossoverRate, double mutationRate) {
+    public void evolution(String sequence, int populationSize, int numberOfGenerations, double cRate, double mRate, boolean ts) {
         ArrayList<Protein> population = new ArrayList<>();
         ArrayList<AminoAcid> acidSequence = acidManager.createAcidSequence(sequence);
         length = sequence.length();
-        numberOfCrossovers = (int) (populationSize * crossoverRate / 2);
-        int numberOfMutations = (int) (populationSize * length * mutationRate);
+        numberOfCrossovers = (int) (populationSize * cRate / 2);
+        mutationRate = mRate;
+        numberOfMutations = (int) (populationSize * length * mutationRate);
 
         for (int i = 0; i < sequence.length(); i++) {
             AcidType currentType = AcidType.UNKNOWN;
             if (sequence.charAt(i) == '0')
-                currentType = AcidType.BLACK;
-            if (sequence.charAt(i) == '1')
                 currentType = AcidType.WHITE;
+            if (sequence.charAt(i) == '1')
+                currentType = AcidType.BLACK;
             acidTypes.add(currentType);
         }
 
@@ -201,7 +248,16 @@ public class EvolutionManagerImpl extends EvolutionManager {
             if (i == 0)
                 this.collectData(population, true, gen);
 
-            population = this.fitnessProportionalSelection(population);
+            if (i != 0 && i % 25 == 0 && mutationRate < 0.1) {
+                mutationRate += 0.1;
+            }
+
+            if(ts){
+                population = this.tournamentSelection(population);
+            }
+            if(!ts) {
+                population = this.fitnessProportionalSelection(population);
+            }
 
             // Here figure out if crossover happens or not based on probability
             for (int j = 0; j < numberOfCrossovers; j++) {
@@ -261,9 +317,13 @@ public class EvolutionManagerImpl extends EvolutionManager {
                 currentFittestProtein = new Protein(protein);
             }
         }
-
+        currentBestCandidate = currentFittestProtein;
         // Calculate the average fitness for the generation
         populationAverageFitness = accumulatedFitness / population.size();
+
+        if (isFirstLine) {
+            prevAverageFitness = populationAverageFitness;
+        }
 
         // Update the best fitness of this generation
         bestFitnessOfGeneration = currentBestFitness;
@@ -277,10 +337,21 @@ public class EvolutionManagerImpl extends EvolutionManager {
             bestEverContacts = bestEverProtein.getContacts(); // Replace with actual method if different
             bestEverOverlappings = bestEverProtein.getOverlapping(); // Replace with actual method if different
         }
-        this.logData(isFirstLine, generation, populationAverageFitness, bestFitnessOfGeneration, bestFitnessEver, bestEverContacts, bestEverOverlappings);
+
+        if (!isFirstLine) {
+            double difference = populationAverageFitness - prevAverageFitness;
+            if (difference > 0 && difference < populationAverageFitness * 0.1)
+                mutationRate += 0.1;
+            else if (difference < -0.07 * populationAverageFitness) {
+                mutationRate -= 0.1;
+            }
+            prevAverageFitness = populationAverageFitness;
+        }
+
+        this.logData(isFirstLine, generation, populationAverageFitness, bestFitnessOfGeneration, bestFitnessEver, bestEverContacts, bestEverOverlappings, mutationRate);
     }
 
-    private void logData(boolean isFirstLine, int gen, double averageGenFit, double bestGenFit, double bestEverFit, int bestEverContacts, int bestEverOverlappings) {
+    private void logData(boolean isFirstLine, int gen, double averageGenFit, double bestGenFit, double bestEverFit, int bestEverContacts, int bestEverOverlappings, double mutationRate) {
         // Set the path to the "output" folder
         String outputFolder = "output";
         File outputDirectory = new File(outputFolder);
@@ -296,11 +367,11 @@ public class EvolutionManagerImpl extends EvolutionManager {
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
             if (!file.exists() || isFirstLine) {
-                writer.write("Generation;AvgGenFitness;BstGenFitness;BstEverFitness;BstEverContacts;BstEverOverlapping\n");
+                writer.write("Generation;AvgGenFitness;BstGenFitness;BstEverFitness;BstEverContacts;BstEverOverlapping;mRate\n");
                 isFirstLine = false;
             }
 
-            writer.write(gen + ";" + df.format(averageGenFit) + ";" + df.format(bestGenFit) + ";" + df.format(bestEverFit) + ";" + bestEverContacts + ";" + bestEverOverlappings + "\n");
+            writer.write(gen + ";" + df.format(averageGenFit) + ";" + df.format(bestGenFit) + ";" + df.format(bestEverFit) + ";" + bestEverContacts + ";" + bestEverOverlappings + ";" + df.format(mutationRate) + "\n");
         } catch (IOException e) {
             e.printStackTrace();
         }
