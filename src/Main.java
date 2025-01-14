@@ -14,20 +14,7 @@ public class Main {
         String SEQ64 = "1111111111110101001100110010011001100100110011001010111111111111";
 
         EvolutionManagerImpl evolutionManager = new EvolutionManagerImpl();
-        evolutionManager.evolution(SEQ64, 200, 300, 0.05, 0.01, true);
+        evolutionManager.evolution(SEQ64, 5000, 150, 0.01, 0.01, true);
 
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
 }

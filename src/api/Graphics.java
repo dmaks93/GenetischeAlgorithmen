@@ -61,7 +61,7 @@ public class Graphics {
         this.writeText(g2, 50, 100, "Contacts: " + contacts);
         this.writeText(g2, 50, 150, "Overlappings: " + overlappings);
         this.writeText(g2, 50, 200, "Fitness: " + fitness);
-        this.writeText(g2, 50, 250, "H/H Bonds:" + hhBonds);
+        //this.writeText(g2, 50, 250, "H/H Bonds:" + hhBonds);
         this.writeText(g2, 50, 300, "Overlappings: " + overlaps);
 
 

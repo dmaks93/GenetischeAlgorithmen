@@ -23,8 +23,8 @@ public class EvolutionManagerImpl extends EvolutionManager {
     FitnessManagerImpl fitnessManager = new FitnessManagerImpl();
     Protein bestEverProtein = new Protein();
     Protein currentBestCandidate;
-    double populationAverageFitness = 0.0;
-    double prevAverageFitness = 0.0;
+    double popAvgFitness = 0.0;
+    double prevPopAvgFitness = 0.0;
     double bestFitnessOfGeneration = 0.0;
     double bestFitnessEver = 0.0;
     int bestEverContacts = 0;
@@ -36,8 +36,9 @@ public class EvolutionManagerImpl extends EvolutionManager {
     int numberOfMutations;
     double mutationRate;
     int length;
-    static int gen = 1;
-    private final DecimalFormat df = new DecimalFormat("#,##0.00", DecimalFormatSymbols.getInstance(Locale.GERMANY));
+    int popSize;
+    int gen = 1;
+    private final DecimalFormat df = new DecimalFormat("#,##0.000000", DecimalFormatSymbols.getInstance(Locale.GERMANY));
 
     @Override
     public ArrayList<Protein> fitnessProportionalSelection(ArrayList<Protein> population) {
@@ -105,7 +106,6 @@ public class EvolutionManagerImpl extends EvolutionManager {
             population.add(firstCandidate);
             population.add(secondCandidate);
         }
-
 
         population.clear();
         population = null;
@@ -190,8 +190,6 @@ public class EvolutionManagerImpl extends EvolutionManager {
         AminoAcid firstAcid = acids.get(acidInSequence);
         AminoAcid secondAcid = acids.get(acidInSequence + 1);
 
-        //Protein observer = population.get(candidateInPopulation);
-
         Direction mutatedDirection;
         boolean isValid = false;
 
@@ -220,9 +218,13 @@ public class EvolutionManagerImpl extends EvolutionManager {
         ArrayList<Protein> population = new ArrayList<>();
         ArrayList<AminoAcid> acidSequence = acidManager.createAcidSequence(sequence);
         length = sequence.length();
+        popSize = populationSize;
         numberOfCrossovers = (int) (populationSize * cRate / 2);
         mutationRate = mRate;
         numberOfMutations = (int) (populationSize * length * mutationRate);
+        long secondsToRun = 15;
+        long start = System.currentTimeMillis();
+        long runtime = secondsToRun*1000;
 
         for (int i = 0; i < sequence.length(); i++) {
             AcidType currentType = AcidType.UNKNOWN;
@@ -248,10 +250,6 @@ public class EvolutionManagerImpl extends EvolutionManager {
             if (i == 0)
                 this.collectData(population, true, gen);
 
-            if (i != 0 && i % 25 == 0 && mutationRate < 0.1) {
-                mutationRate += 0.1;
-            }
-
             if(ts){
                 population = this.tournamentSelection(population);
             }
@@ -267,39 +265,15 @@ public class EvolutionManagerImpl extends EvolutionManager {
             for (int k = 0; k < numberOfMutations; k++) {
                 mutate(population);
             }
-
-            // Here figure out if mutation happens or not based on probability
-            // Mutation should be adjusted here if needed
-            // Calculate fitness for protein here
-
-            // Evaluation has to be added
         }
+
         System.out.println(bestEverProtein.getContacts());
         System.out.println(bestEverProtein.getOverlapping());
         System.out.println(bestEverProtein.getFitness());
+
         Graphics graphics = new Graphics(bestEverProtein, sequence);
         graphics.drawProtein();
-    }
 
-    private void adaptCoordinates(AminoAcid acid) {
-        Direction prevDirection = acid.getPreviousAcidDirection();
-
-        if (prevDirection == Direction.Up) {
-            acid.setCoordinates(prevX, prevY - 1);
-            prevY = prevY - 1;
-        }
-        if (prevDirection == Direction.Down) {
-            acid.setCoordinates(prevX, prevY + 1);
-            prevY = prevY + 1;
-        }
-        if (prevDirection == Direction.Left) {
-            acid.setCoordinates(prevX + 1, prevY);
-            prevX = prevX + 1;
-        }
-        if (prevDirection == Direction.Right) {
-            acid.setCoordinates(prevX - 1, prevY);
-            prevX = prevX - 1;
-        }
     }
 
     private void collectData(ArrayList<Protein> population, boolean isFirstLine, int generation) {
@@ -317,13 +291,34 @@ public class EvolutionManagerImpl extends EvolutionManager {
                 currentFittestProtein = new Protein(protein);
             }
         }
+        if (!isFirstLine) {
+            prevPopAvgFitness = popAvgFitness;
+        }
         currentBestCandidate = currentFittestProtein;
         // Calculate the average fitness for the generation
-        populationAverageFitness = accumulatedFitness / population.size();
+        popAvgFitness = accumulatedFitness / population.size();
 
-        if (isFirstLine) {
-            prevAverageFitness = populationAverageFitness;
-        }
+      if (!isFirstLine) {
+          double difference = popAvgFitness - prevPopAvgFitness;
+          if (difference > 0) {
+              if (difference < popAvgFitness * 0.05)
+                  mutationRate += 0.00025;
+              else if (difference < popAvgFitness * 0.1)
+                  mutationRate += 0.0005;
+             else if (difference > popAvgFitness * 0.15)
+                 mutationRate -= 0.00025;
+          }
+          else if (difference < 0) {
+              if (difference < -popAvgFitness * 0.04)
+                  mutationRate -= 0.0005;
+              else if (difference <= -popAvgFitness * 0.07)
+                  mutationRate -= 0.001;
+              else if (difference <= -popAvgFitness * 0.1)
+                  mutationRate -= 0.01;
+          }
+          if (mutationRate <= 0)
+              mutationRate = 0.01;
+      }
 
         // Update the best fitness of this generation
         bestFitnessOfGeneration = currentBestFitness;
@@ -332,23 +327,15 @@ public class EvolutionManagerImpl extends EvolutionManager {
         if (currentBestFitness > bestFitnessEver) {
             bestFitnessEver = currentBestFitness;
             bestEverProtein = new Protein(currentFittestProtein);
-
-            // Assuming `contacts` and `overlapping` can be retrieved from the protein:
-            bestEverContacts = bestEverProtein.getContacts(); // Replace with actual method if different
-            bestEverOverlappings = bestEverProtein.getOverlapping(); // Replace with actual method if different
+            if (bestEverContacts < bestEverProtein.getContacts())
+                bestEverContacts = bestEverProtein.getContacts();
+            if (bestEverOverlappings > bestEverProtein.getOverlapping())
+                bestEverOverlappings = bestEverProtein.getOverlapping();
         }
 
-        if (!isFirstLine) {
-            double difference = populationAverageFitness - prevAverageFitness;
-            if (difference > 0 && difference < populationAverageFitness * 0.1)
-                mutationRate += 0.1;
-            else if (difference < -0.07 * populationAverageFitness) {
-                mutationRate -= 0.1;
-            }
-            prevAverageFitness = populationAverageFitness;
-        }
+        numberOfMutations = (int) (popSize * length * mutationRate);
 
-        this.logData(isFirstLine, generation, populationAverageFitness, bestFitnessOfGeneration, bestFitnessEver, bestEverContacts, bestEverOverlappings, mutationRate);
+        this.logData(isFirstLine, generation, popAvgFitness, bestFitnessOfGeneration, bestFitnessEver, bestEverContacts, bestEverOverlappings, mutationRate);
     }
 
     private void logData(boolean isFirstLine, int gen, double averageGenFit, double bestGenFit, double bestEverFit, int bestEverContacts, int bestEverOverlappings, double mutationRate) {
@@ -376,4 +363,26 @@ public class EvolutionManagerImpl extends EvolutionManager {
             e.printStackTrace();
         }
     }
+
+    private void adaptCoordinates(AminoAcid acid) {
+        Direction prevDirection = acid.getPreviousAcidDirection();
+
+        if (prevDirection == Direction.Up) {
+            acid.setCoordinates(prevX, prevY - 1);
+            prevY = prevY - 1;
+        }
+        if (prevDirection == Direction.Down) {
+            acid.setCoordinates(prevX, prevY + 1);
+            prevY = prevY + 1;
+        }
+        if (prevDirection == Direction.Left) {
+            acid.setCoordinates(prevX + 1, prevY);
+            prevX = prevX + 1;
+        }
+        if (prevDirection == Direction.Right) {
+            acid.setCoordinates(prevX - 1, prevY);
+            prevX = prevX - 1;
+        }
+    }
+
 }

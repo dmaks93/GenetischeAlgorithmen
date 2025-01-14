@@ -1,6 +1,5 @@
 package api;
 
-import entity.AminoAcid;
 import entity.Protein;
 
 import java.util.ArrayList;
